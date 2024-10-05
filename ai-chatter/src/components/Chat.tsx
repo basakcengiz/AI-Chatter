@@ -17,6 +17,10 @@ const Chat = ({ messages, isTyping }: Props) => {
 
   return (
     <div className="bg-white w-4/5 h-3/5 rounded-lg overflow-scroll" ref={messageBox}>
+      <div className="flex items-end p-2">
+        <img alt="chatGPTLogo" src={chatGPTLogo} width={36} height={36} style={{ margin: '5px' }}></img>
+        <div className="bg-[#EEEEF8] w-fit max-w-[60%] p-4 rounded-tl-2xl rounded-br-2xl rounded-tr-2xl">Hello, I'm ChatGPT! Ask me anything!</div>
+      </div>
       <>
         {messages.map((message, index) =>
           message.role === 'assistant' ? (

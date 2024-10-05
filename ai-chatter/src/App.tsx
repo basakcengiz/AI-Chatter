@@ -11,17 +11,11 @@ import toast, { Toaster } from 'react-hot-toast';
 
 function App() {
   const [inputValue, setInputValue] = useState('');
-  const [messages, setMessages] = useState([
-    {
-      message: "Hello, I'm ChatGPT! Ask me anything!",
-      role: 'assistant'
-    }
-  ] as Message[]);
+  const [messages, setMessages] = useState([] as Message[]);
 
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
   const sendMessage = async (inputValue: string) => {
-    console.log('sended');
     const newMessage = {
       message: inputValue,
       role: 'user'
@@ -79,7 +73,6 @@ function App() {
       }
     }
   };
-  console.log(messages);
   return (
     <div className="flex flex-col items-center justify-center bg-[#DBDCFF] h-screen">
       <Chat messages={messages} isTyping={isTyping} />

@@ -11,7 +11,12 @@ import toast, { Toaster } from 'react-hot-toast';
 
 function App() {
   const [inputValue, setInputValue] = useState('');
-  const [messages, setMessages] = useState([] as Message[]);
+  const [messages, setMessages] = useState([
+    {
+      role: 'system',
+      message: 'You are a helpful assistant.'
+    }
+  ] as Message[]);
 
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
@@ -20,30 +25,25 @@ function App() {
       message: inputValue,
       role: 'user'
     };
-    const newMessages = [...messages, newMessage] as Message[];
-    setMessages(newMessages);
+
+    setMessages((prevMessages) => [...prevMessages, newMessage] as Message[]);
     setInputValue('');
-    await fetchResponse();
+    await fetchResponse([...messages, newMessage] as Message[]);
   };
 
-  const fetchResponse = async () => {
+  const fetchResponse = async (updatedMessages: Message[]) => {
     const apiKey = import.meta.env.VITE_API_KEY;
+
     try {
       setIsTyping(true);
       const response = await axios.post(
         `https://api.openai.com/v1/chat/completions`,
         {
           model: 'gpt-4o',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a helpful assistant.'
-            },
-            ...messages.map((msg) => ({
-              role: msg.role,
-              content: msg.message
-            }))
-          ],
+          messages: updatedMessages.map((message) => ({
+            role: message.role,
+            content: message.message
+          })),
           temperature: 0.7
         },
         {
@@ -61,7 +61,6 @@ function App() {
         }
       ]);
       setIsTyping(false);
-      console.log(response.data.choices[0].message);
     } catch (error) {
       setIsTyping(false);
       if (axios.isAxiosError(error)) {

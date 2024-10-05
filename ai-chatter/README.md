@@ -1,50 +1,57 @@
-# React + TypeScript + Vite
+# AI CHATTER
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AI Chatter is a real-time chat application that uses the OpenAI API to provide dynamic AI-powered responses.
+- Live : https://ai-chatter-ten.vercel.app/
 
-Currently, two official plugins are available:
+### Technologies Used
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React: For building the user interface.
+- TypeScript: To ensure static typing and improved development experience.
+- React Hot Toast: To display user notifications.
+- Tailwind CSS: For fast, responsive styling.
+- Fetch API: For making HTTP requests.
+  
+### Features
 
-## Expanding the ESLint configuration
+- Streaming API Responses: Responses are streamed and displayed incrementally, just like ChatGPT.
+- Abort Functionality: Users can stop the conversation at any time with a cancel button.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Installation
 
-- Configure the top-level `parserOptions` property like this:
+Clone the repository to your local machine:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+ ```bash
+git clone https://github.com/yourusername/ai-chatter.git
+cd ai-chatter
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Navigate to the project directory:
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+ ```bash
+cd ai-chatter
 ```
+
+Install the dependencies:
+
+ ```bash
+yarn
+```
+or
+
+ ```bash
+npm install
+```
+
+Start the development server:
+
+ ```bash
+yarn run dev
+```
+or
+
+ ```bash
+npm run dev
+```
+
+<img width="1436" alt="image" src="https://github.com/user-attachments/assets/1100f130-0ab3-40aa-9a7f-67e0cd4c51fc">
+

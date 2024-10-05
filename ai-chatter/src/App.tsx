@@ -74,11 +74,13 @@ function App() {
     }
   };
   return (
-    <div className="flex flex-col items-center justify-center bg-[#DBDCFF] h-screen">
-      <Chat messages={messages} isTyping={isTyping} />
-      <Input value={inputValue} setValue={setInputValue} handleSend={sendMessage} />
+    <>
+      <div className="flex flex-col items-center justify-center bg-[#DBDCFF] h-screen">
+        <Chat messages={messages} isTyping={isTyping} />
+        <Input value={inputValue} setValue={setInputValue} handleSend={sendMessage} />
+      </div>
       <Toaster position="top-center" reverseOrder={false} />
-    </div>
+    </>
   );
 }
 

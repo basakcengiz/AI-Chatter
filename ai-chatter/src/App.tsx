@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import './App.css';
 
 import Chat from './components/Chat';
@@ -6,7 +6,6 @@ import Input from './components/Input';
 
 import { Message } from './types';
 
-import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 
 function App() {
@@ -19,6 +18,7 @@ function App() {
   ] as Message[]);
 
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const sendMessage = async (inputValue: string) => {
     const newMessage = {
@@ -33,38 +33,76 @@ function App() {
 
   const fetchResponse = async (updatedMessages: Message[]) => {
     const apiKey = import.meta.env.VITE_API_KEY;
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
 
     try {
       setIsTyping(true);
-      const response = await axios.post(
-        `https://api.openai.com/v1/chat/completions`,
-        {
-          model: 'gpt-4o',
+      const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
           messages: updatedMessages.map((message) => ({
             role: message.role,
             content: message.message
           })),
-          temperature: 0.7
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
+          temperature: 0.7,
+          stream: true
+        }),
+        signal
+      });
+
+      if (!response || !response.body) return;
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+
+      let streamingMessage = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        const parsedLines = lines
+          .map((line) => line.replace(/^data: /, '').trim())
+          .filter((line) => line !== '' && line !== '[DONE]')
+          .map((line) => JSON.parse(line));
+
+        for (const parsedLine of parsedLines) {
+          const content = parsedLine.choices[0].delta.content;
+          if (content) {
+            streamingMessage += content;
+
+            setMessages((prevMessages) => {
+              const updatedMessages = [...prevMessages];
+              if (updatedMessages[updatedMessages.length - 1].role === 'user') {
+                updatedMessages.push({
+                  message: '',
+                  role: 'assistant'
+                });
+              }
+              updatedMessages[updatedMessages.length - 1] = {
+                message: streamingMessage,
+                role: 'assistant'
+              };
+              return updatedMessages;
+            });
           }
         }
-      );
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          message: response.data.choices[0].message.content,
-          role: response.data.choices[0].message.role
-        }
-      ]);
+      }
+
       setIsTyping(false);
     } catch (error) {
       setIsTyping(false);
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.error?.message || 'An error occurred');
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        toast.success('Request cancelled');
       } else if (error instanceof Error) {
         toast.error(error.message);
       } else {
@@ -72,14 +110,19 @@ function App() {
       }
     }
   };
+
+  const stopRequest = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setIsTyping(false);
+    }
+  };
   return (
-    <>
-      <div className="flex flex-col items-center justify-center bg-[#DBDCFF] h-screen">
-        <Chat messages={messages} isTyping={isTyping} />
-        <Input value={inputValue} setValue={setInputValue} handleSend={sendMessage} />
-      </div>
+    <div className="flex flex-col items-center justify-center bg-[#DBDCFF] h-screen">
+      <Chat messages={messages} isTyping={isTyping} />
+      <Input value={inputValue} setValue={setInputValue} handleSend={sendMessage} isTyping={isTyping} handleStop={stopRequest} />
       <Toaster position="top-center" reverseOrder={false} />
-    </>
+    </div>
   );
 }
 

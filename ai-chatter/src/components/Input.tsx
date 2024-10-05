@@ -1,17 +1,20 @@
-import { Send2 } from 'iconsax-react';
+import { Send2, StopCircle } from 'iconsax-react';
 
 type Props = {
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
   handleSend: (inputValue: string) => void;
+  isTyping: boolean;
+  handleStop: () => void;
 };
 
-const Input = ({ value, setValue, handleSend }: Props) => {
+const Input = ({ value, setValue, handleSend, isTyping, handleStop }: Props) => {
   return (
     <div className="w-4/5 relative mt-2">
       <form
         onSubmit={(event) => {
           event.preventDefault();
+          if (value.trim() === '') return;
           handleSend(value);
         }}
       >
@@ -23,9 +26,15 @@ const Input = ({ value, setValue, handleSend }: Props) => {
             setValue(event.target.value);
           }}
         />
-        <button className="absolute right-6 top-6 text-gray-600 hover:text-[#7678ED]">
-          <Send2 size="32" color="currentColor" />
-        </button>
+        {isTyping ? (
+          <button onClick={handleStop} className="absolute right-6 top-6 text-gray-600">
+            <StopCircle size="32" color="currentColor" />
+          </button>
+        ) : (
+          <button className="absolute right-6 top-6 text-gray-600 hover:text-[#7678ED]">
+            <Send2 type="submit" size="32" color="currentColor" />
+          </button>
+        )}
       </form>
     </div>
   );

@@ -22,7 +22,6 @@ Clone the repository to your local machine:
 
  ```bash
 git clone https://github.com/yourusername/ai-chatter.git
-cd ai-chatter
 ```
 
 Navigate to the project directory:
